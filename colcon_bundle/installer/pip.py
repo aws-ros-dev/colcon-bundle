@@ -17,9 +17,14 @@ class PipBundleInstallerExtensionPoint(BasePipInstallerExtensionPoint):
             help='Pass arguments to CMake projects. '
             'Arguments matching other options in colcon must be prefixed '
             'by a space,\ne.g. --pip-args " --help"')
+        # TODO: REMOVE
+        parser.add_argument(
+            '--pip-requirements', type=str,
+            help='Path to a requirements.txt')
 
     def initialize(self, context):  # noqa: D102
         super().initialize(context)
         self._python_path = os.path.join(
             self.context.prefix_path, 'usr', 'bin', 'python2')
         self._pip_args = self.context.args.pip_args
+        self.additional_requirements = self.context.args.pip_requirements

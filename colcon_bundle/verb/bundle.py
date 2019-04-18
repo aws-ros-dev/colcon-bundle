@@ -109,10 +109,12 @@ class BundleVerb(VerbExtensionPoint):
         add_installer_arguments(decorated_parser)
 
     def main(self, *, context):  # noqa: D102
-        print('Bundling workspace...')
         upgrade_deps_graph = context.args.upgrade
         install_base = os.path.abspath(context.args.install_base)
         bundle_base = os.path.abspath(context.args.bundle_base)
+        if context.args.pip_requirements is not None:
+            print('Using Python dependencies from {}',
+                  context.args.pip_requirements)
 
         if not os.path.exists(install_base):
             raise RuntimeError(

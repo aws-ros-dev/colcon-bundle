@@ -28,6 +28,7 @@ class BasePipInstallerExtensionPoint(BundleInstallerExtensionPoint):
         self._cache_path = None
         self._python_path = None
         self._pip_args = None
+        self.additional_requirements = None
 
     def initialize(self, context):  # noqa: D102
         self.context = context
@@ -47,7 +48,7 @@ class BasePipInstallerExtensionPoint(BundleInstallerExtensionPoint):
         self._packages.remove(name)
 
     def install(self):  # noqa: D102
-        if len(self._packages) == 0:
+        if len(self._packages) == 0 and self.additional_requirements is None:
             logger.info('No dependencies to install for {}'.format(
                 os.path.basename(self._python_path)
             ))
@@ -71,6 +72,12 @@ class BasePipInstallerExtensionPoint(BundleInstallerExtensionPoint):
         python_pip_args = [self._python_path, '-m', 'pip']
         pip_install_args = python_pip_args + ['install']
         subprocess.check_call(pip_install_args + ['-U', 'pip', 'setuptools'])
+
+        # TODO: REMOVE
+        if self.additional_requirements is not None:
+            with open(self.additional_requirements) as req:
+                for requirement in req.readlines():
+                    self._packages.append(requirement)
 
         with open(requirements_file, 'w') as req:
             for name in self._packages:
